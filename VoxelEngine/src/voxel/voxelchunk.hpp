@@ -14,7 +14,7 @@ namespace vx
 
         glm::ivec2 getPosition() const;
 
-        Voxel getVoxelAt(const uint32_t x, const uint32_t y, const uint32_t z) const;
+        Voxel* getVoxelAt(const uint32_t x, const uint32_t y, const uint32_t z) const;
 
         static uint32_t SIZE;
         static uint32_t HEIGHT;

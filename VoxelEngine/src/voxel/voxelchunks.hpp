@@ -15,7 +15,7 @@ namespace vx
         VoxelChunks();
         ~VoxelChunks();
 
-        void addChunkAt(const glm::ivec2& chunkPosition);
+        void addChunk(const glm::ivec2& chunkPosition, VoxelChunk* chunk);
         void removeChunkAt(const glm::ivec2& chunkPosition);
 
         VoxelChunk* getChunkAt(const glm::ivec2& chunkPosition) const;

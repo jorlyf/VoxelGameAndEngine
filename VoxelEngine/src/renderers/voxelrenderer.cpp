@@ -24,38 +24,38 @@ std::shared_ptr<vx::Mesh> vx::VoxelRenderer::renderChunk(
         {
             for (int32_t x = 0; x < VoxelChunk::SIZE; x++)
             {
-                const Voxel voxel = voxelChunk.getVoxelAt(x, y, z);
+                const Voxel& voxel = *voxelChunk.getVoxelAt(x, y, z);
                 const uint16_t voxelId = voxel.getId();
 
                 const uint16_t voidVoxelId = 0;
                 if (voxelId == voidVoxelId) continue;
 
-                if ((y + 1) >= VoxelChunk::HEIGHT || voxelChunk.getVoxelAt(x, y + 1, z).getId() == voidVoxelId)
+                if ((y + 1) >= VoxelChunk::HEIGHT || voxelChunk.getVoxelAt(x, y + 1, z)->getId() == voidVoxelId)
                 {
                     renderTopFace(triangleIndex, voxel, x, y, z);
                     triangleIndex += 2;
                 }
-                if ((y - 1) < 0 || voxelChunk.getVoxelAt(x, y - 1, z).getId() == voidVoxelId)
+                if ((y - 1) < 0 || voxelChunk.getVoxelAt(x, y - 1, z)->getId() == voidVoxelId)
                 {
                     renderBottomFace(triangleIndex, voxel, x, y, z);
                     triangleIndex += 2;
                 }
-                if ((x + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(x + 1, y, z).getId() == voidVoxelId)
+                if ((x + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(x + 1, y, z)->getId() == voidVoxelId)
                 {
                     renderNorthFace(triangleIndex, voxel, x, y, z);
                     triangleIndex += 2;
                 }
-                if ((x - 1) < 0 || voxelChunk.getVoxelAt(x - 1, y, z).getId() == voidVoxelId)
+                if ((x - 1) < 0 || voxelChunk.getVoxelAt(x - 1, y, z)->getId() == voidVoxelId)
                 {
                     renderSouthFace(triangleIndex, voxel, x, y, z);
                     triangleIndex += 2;
                 }
-                if ((z - 1) < 0 || voxelChunk.getVoxelAt(x, y, z - 1).getId() == voidVoxelId)
+                if ((z - 1) < 0 || voxelChunk.getVoxelAt(x, y, z - 1)->getId() == voidVoxelId)
                 {
                     renderWestFace(triangleIndex, voxel, x, y, z);
                     triangleIndex += 2;
                 }
-                if ((z + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(x, y, z + 1).getId() == voidVoxelId)
+                if ((z + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(x, y, z + 1)->getId() == voidVoxelId)
                 {
                     renderEastFace(triangleIndex, voxel, x, y, z);
                     triangleIndex += 2;

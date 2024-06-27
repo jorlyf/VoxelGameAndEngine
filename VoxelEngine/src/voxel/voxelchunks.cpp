@@ -9,9 +9,9 @@ vx::VoxelChunks::~VoxelChunks()
 {
 }
 
-void vx::VoxelChunks::addChunkAt(const glm::ivec2& chunkPosition)
+void vx::VoxelChunks::addChunk(const glm::ivec2& chunkPosition, VoxelChunk* chunk)
 {
-    _chunks.insert({ chunkPosition, std::shared_ptr<VoxelChunk>(new VoxelChunk(chunkPosition)) });
+    _chunks.insert({ chunkPosition, std::shared_ptr<VoxelChunk>(chunk) });
 }
 
 void vx::VoxelChunks::removeChunkAt(const glm::ivec2& chunkPosition)
