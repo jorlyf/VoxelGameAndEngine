@@ -26,7 +26,8 @@ std::shared_ptr<vx::Mesh> vx::VoxelRenderer::renderChunk(
         {
             for (int32_t x = 0; x < VoxelChunk::SIZE; x++)
             {
-                const Voxel& voxel = *voxelChunk.getVoxelAt(x, y, z);
+                const glm::ivec3 localPosition(x, y, z);
+                const Voxel& voxel = *voxelChunk.getVoxelAt(localPosition);
                 const uint16_t voxelId = voxel.getId();
 
                 const std::string blockType = voxelId == 1 ? "grass" : "cyan_wool";
@@ -35,34 +36,34 @@ std::shared_ptr<vx::Mesh> vx::VoxelRenderer::renderChunk(
                 const uint16_t voidVoxelId = 0;
                 if (voxelId == voidVoxelId) continue;
 
-                if ((y + 1) >= VoxelChunk::HEIGHT || voxelChunk.getVoxelAt(x, y + 1, z)->getId() == voidVoxelId)
+                if ((y + 1) >= VoxelChunk::HEIGHT || voxelChunk.getVoxelAt(glm::ivec3(x, y + 1, z))->getId() == voidVoxelId)
                 {
-                    renderTopFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
+                    renderTopFace(triangleIndex, voxel, localPosition, uv);
                     triangleIndex += 2;
                 }
-                if ((y - 1) < 0 || voxelChunk.getVoxelAt(x, y - 1, z)->getId() == voidVoxelId)
+                if ((y - 1) < 0 || voxelChunk.getVoxelAt(glm::ivec3(x, y - 1, z))->getId() == voidVoxelId)
                 {
-                    renderBottomFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
+                    renderBottomFace(triangleIndex, voxel, localPosition, uv);
                     triangleIndex += 2;
                 }
-                if ((x + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(x + 1, y, z)->getId() == voidVoxelId)
+                if ((x + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(glm::ivec3(x + 1, y, z))->getId() == voidVoxelId)
                 {
-                    renderNorthFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
+                    renderNorthFace(triangleIndex, voxel, localPosition, uv);
                     triangleIndex += 2;
                 }
-                if ((x - 1) < 0 || voxelChunk.getVoxelAt(x - 1, y, z)->getId() == voidVoxelId)
+                if ((x - 1) < 0 || voxelChunk.getVoxelAt(glm::ivec3(x - 1, y, z))->getId() == voidVoxelId)
                 {
-                    renderSouthFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
+                    renderSouthFace(triangleIndex, voxel, localPosition, uv);
                     triangleIndex += 2;
                 }
-                if ((z - 1) < 0 || voxelChunk.getVoxelAt(x, y, z - 1)->getId() == voidVoxelId)
+                if ((z - 1) < 0 || voxelChunk.getVoxelAt(glm::ivec3(x, y, z - 1))->getId() == voidVoxelId)
                 {
-                    renderWestFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
+                    renderWestFace(triangleIndex, voxel, localPosition, uv);
                     triangleIndex += 2;
                 }
-                if ((z + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(x, y, z + 1)->getId() == voidVoxelId)
+                if ((z + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(glm::ivec3(x, y, z + 1))->getId() == voidVoxelId)
                 {
-                    renderEastFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
+                    renderEastFace(triangleIndex, voxel, localPosition, uv);
                     triangleIndex += 2;
                 }
 

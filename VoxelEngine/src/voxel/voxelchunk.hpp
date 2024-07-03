@@ -14,7 +14,8 @@ namespace vx
 
         glm::ivec2 getPosition() const;
 
-        Voxel* getVoxelAt(const uint32_t x, const uint32_t y, const uint32_t z) const;
+        Voxel* getVoxelAt(const glm::ivec3& position) const;
+        glm::ivec3 getVoxelWorldPosition(const glm::ivec3& position);
 
         static uint32_t SIZE;
         static uint32_t HEIGHT;
@@ -27,6 +28,6 @@ namespace vx
 
         glm::ivec2 _position;
 
-        uint32_t getVoxelIndexAt(const uint32_t x, const uint32_t y, const uint32_t z) const;
+        uint32_t getVoxelIndexAt(const glm::ivec3& position) const;
     };
 }

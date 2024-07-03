@@ -6,7 +6,7 @@
 #include "voxelchunks.hpp"
 #include "deltatime.hpp"
 #include "pathmanager.hpp"
-#include "chunkgeneratorflat.hpp"
+#include "chunkgeneratorellipse.hpp"
 
 vxg::GameEngine::GameEngine(
     const std::string& windowTitle
@@ -161,7 +161,11 @@ void vxg::GameEngine::generateVoxelChunks()
         cameraPosition.z / vx::VoxelChunk::VOXEL_SIZE
     );
 
-    ChunkGeneratorFlat generator;
+    ChunkGeneratorEllipse generator(
+        2,
+        glm::ivec3(16, 8, 24),
+        glm::ivec3(0, 16, 0)
+    );
 
     const int32_t generateChunkRadius = 5;
     for (int32_t x = cameraChunkPosition.x - generateChunkRadius; x < cameraChunkPosition.x + generateChunkRadius; x++)

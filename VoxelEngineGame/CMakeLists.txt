@@ -35,6 +35,7 @@ add_subdirectory(../VoxelEngine voxel-engine)
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/chunk-generators/ellipse/chunkgeneratorellipse.cpp
     src/chunk-generators/flat/chunkgeneratorflat.cpp
     src/engine/gameengine.cpp
 )
@@ -50,6 +51,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}
     src
+    src/chunk-generators/ellipse
     src/chunk-generators/flat
     src/engine
 )

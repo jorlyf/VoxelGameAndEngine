@@ -12,7 +12,8 @@ vx::VoxelChunk* vxg::ChunkGeneratorFlat::generate(const glm::ivec2& position)
     {
         for (int32_t x = 0; x < vx::VoxelChunk::SIZE; x++)
         {
-            *chunk->getVoxelAt(x, 0, z) = vx::Voxel(1);
+            const glm::ivec3 localPosition(x, 0, z);
+            *chunk->getVoxelAt(localPosition) = vx::Voxel(2);
         }
     }
 
