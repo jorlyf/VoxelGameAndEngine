@@ -35,6 +35,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     ${GLFW_LIB}
     ${GLEW_LIB}
     voxel-engine-graphics
+    voxel-engine-voxel
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

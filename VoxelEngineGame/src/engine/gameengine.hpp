@@ -5,11 +5,11 @@
 #include "camera.hpp"
 #include "engine.hpp"
 #include "shader.hpp"
-#include "texture.hpp"
 #include "mesh.hpp"
 #include "voxelchunks.hpp"
 #include "voxelrenderer.hpp"
 #include "linerenderer.hpp"
+#include "textureatlas.hpp"
 
 namespace vxg
 {
@@ -28,7 +28,7 @@ namespace vxg
 
         GLuint _VAO, _VBO;
         std::shared_ptr<vx::Shader> _shader = nullptr;
-        std::shared_ptr<vx::Texture> _texture = nullptr;
+        std::shared_ptr<vx::TextureAtlas> _textureAtlas = nullptr;
 
         std::shared_ptr<vx::VoxelChunks> _chunks = nullptr;
         std::vector<std::pair<vx::VoxelChunk*, std::shared_ptr<vx::Mesh>>> _chunkMeshes;

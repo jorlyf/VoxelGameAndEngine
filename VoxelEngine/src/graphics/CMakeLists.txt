@@ -35,6 +35,7 @@ add_library(${PROJECT_NAME} STATIC
     mesh.cpp
     shader.cpp
     texture.cpp
+    textureatlas.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC

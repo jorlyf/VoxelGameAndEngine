@@ -1,7 +1,9 @@
 #include "voxelrenderer.hpp"
 
-vx::VoxelRenderer::VoxelRenderer()
+vx::VoxelRenderer::VoxelRenderer(TextureAtlas* textureAtlas)
 {
+    _textureAtlas = textureAtlas;
+
     const uint32_t VERTEX_PER_VOXEL = 6 * 6;
     const uint32_t VERTEX_SIZE = 5;
     const uint32_t MAX_VOXEL_COUNT_PER_CHUNK = VoxelChunk::getVolume();
@@ -27,37 +29,40 @@ std::shared_ptr<vx::Mesh> vx::VoxelRenderer::renderChunk(
                 const Voxel& voxel = *voxelChunk.getVoxelAt(x, y, z);
                 const uint16_t voxelId = voxel.getId();
 
+                const std::string blockType = voxelId == 1 ? "grass" : "cyan_wool";
+                const TextureAtlas::TextureUV uv = _textureAtlas->getTextureUV(blockType);
+
                 const uint16_t voidVoxelId = 0;
                 if (voxelId == voidVoxelId) continue;
 
                 if ((y + 1) >= VoxelChunk::HEIGHT || voxelChunk.getVoxelAt(x, y + 1, z)->getId() == voidVoxelId)
                 {
-                    renderTopFace(triangleIndex, voxel, x, y, z);
+                    renderTopFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
                     triangleIndex += 2;
                 }
                 if ((y - 1) < 0 || voxelChunk.getVoxelAt(x, y - 1, z)->getId() == voidVoxelId)
                 {
-                    renderBottomFace(triangleIndex, voxel, x, y, z);
+                    renderBottomFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
                     triangleIndex += 2;
                 }
                 if ((x + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(x + 1, y, z)->getId() == voidVoxelId)
                 {
-                    renderNorthFace(triangleIndex, voxel, x, y, z);
+                    renderNorthFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
                     triangleIndex += 2;
                 }
                 if ((x - 1) < 0 || voxelChunk.getVoxelAt(x - 1, y, z)->getId() == voidVoxelId)
                 {
-                    renderSouthFace(triangleIndex, voxel, x, y, z);
+                    renderSouthFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
                     triangleIndex += 2;
                 }
                 if ((z - 1) < 0 || voxelChunk.getVoxelAt(x, y, z - 1)->getId() == voidVoxelId)
                 {
-                    renderWestFace(triangleIndex, voxel, x, y, z);
+                    renderWestFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
                     triangleIndex += 2;
                 }
                 if ((z + 1) >= VoxelChunk::SIZE || voxelChunk.getVoxelAt(x, y, z + 1)->getId() == voidVoxelId)
                 {
-                    renderEastFace(triangleIndex, voxel, x, y, z);
+                    renderEastFace(triangleIndex, voxel, glm::vec3(x, y, z), uv);
                     triangleIndex += 2;
                 }
 
@@ -75,287 +80,281 @@ std::shared_ptr<vx::Mesh> vx::VoxelRenderer::renderChunk(
 void vx::VoxelRenderer::renderTopFace(
     const uint32_t triangleIndex,
     const Voxel& voxel,
-    const float x,
-    const float y,
-    const float z
+    const glm::vec3 position,
+    const TextureAtlas::TextureUV uv
 )
 {
     const uint32_t VERTEX_SIZE = 5;
     uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderBottomFace(
     const uint32_t triangleIndex,
     const Voxel& voxel,
-    const float x,
-    const float y,
-    const float z
+    const glm::vec3 position,
+    const TextureAtlas::TextureUV uv
 )
 {
     const uint32_t VERTEX_SIZE = 5;
     uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 }
 
 void vx::VoxelRenderer::renderNorthFace(
     const uint32_t triangleIndex,
     const Voxel& voxel,
-    const float x,
-    const float y,
-    const float z
+    const glm::vec3 position,
+    const TextureAtlas::TextureUV uv
 )
 {
     const uint32_t VERTEX_SIZE = 5;
     uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderSouthFace(
     const uint32_t triangleIndex,
     const Voxel& voxel,
-    const float x,
-    const float y,
-    const float z
+    const glm::vec3 position,
+    const TextureAtlas::TextureUV uv
 )
 {
     const uint32_t VERTEX_SIZE = 5;
     uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderWestFace(
     const uint32_t triangleIndex,
     const Voxel& voxel,
-    const float x,
-    const float y,
-    const float z
+    const glm::vec3 position,
+    const TextureAtlas::TextureUV uv
 )
 {
     const uint32_t VERTEX_SIZE = 5;
     uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z - 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z - 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 }
 
 void vx::VoxelRenderer::renderEastFace(
     const uint32_t triangleIndex,
     const Voxel& voxel,
-    const float x,
-    const float y,
-    const float z
+    const glm::vec3 position,
+    const TextureAtlas::TextureUV uv
 )
 {
     const uint32_t VERTEX_SIZE = 5;
     uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y - 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 0;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y - 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y;
 
-    _buffer[i++] = x + 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 1;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x + 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x + uv.size.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 
-    _buffer[i++] = x - 0.5f;
-    _buffer[i++] = y + 0.5f;
-    _buffer[i++] = z + 0.5f;
-    _buffer[i++] = 0;
-    _buffer[i++] = 1;
+    _buffer[i++] = position.x - 0.5f;
+    _buffer[i++] = position.y + 0.5f;
+    _buffer[i++] = position.z + 0.5f;
+    _buffer[i++] = uv.position.x;
+    _buffer[i++] = uv.position.y + uv.size.y;
 }

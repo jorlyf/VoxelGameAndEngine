@@ -35,9 +35,18 @@ void vxg::GameEngine::onStart()
         resourcesPath + "/shaders/line.glslv",
         resourcesPath + "/shaders/line.glslf"
     ));
-    _texture = std::shared_ptr<vx::Texture>(vx::Texture::loadFromFile(resourcesPath + "/cyan_wool.png"));
 
-    _voxelRenderer = std::shared_ptr<vx::VoxelRenderer>(new vx::VoxelRenderer());
+    std::map<std::string, uint16_t> textureAtlasBinding;
+    textureAtlasBinding["grass"] = 0;
+    textureAtlasBinding["cyan_wool"] = 1;
+
+    _textureAtlas = std::shared_ptr<vx::TextureAtlas>(vx::TextureAtlas::loadFromFile(
+        textureAtlasBinding,
+        glm::ivec2(64, 64),
+        resourcesPath + "/atlas.png"
+    ));
+
+    _voxelRenderer = std::shared_ptr<vx::VoxelRenderer>(new vx::VoxelRenderer(_textureAtlas.get()));
     _chunks = std::shared_ptr<vx::VoxelChunks>(new vx::VoxelChunks());
     generateVoxelChunks();
     renderVoxelChunks();
@@ -112,7 +121,7 @@ void vxg::GameEngine::onRender()
     _shader->use();
     _shader->setUniformMatrix("projview", _camera->getProjectionViewMatrix());
 
-    _texture->bind();
+    _textureAtlas->bind();
     for (auto& chunkMesh : _chunkMeshes)
     {
         const vx::VoxelChunk* chunk = chunkMesh.first;
