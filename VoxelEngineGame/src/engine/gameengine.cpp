@@ -48,7 +48,7 @@ void vxg::GameEngine::onStart()
         resourcesPath + "/atlas.png"
     ));
 
-    vx::IVoxelChunkGenerator* generator = new ChunkGeneratorStandard();
+    vx::IVoxelChunkGenerator* generator = new ChunkGeneratorFlat();
 
     _voxelRenderer = std::shared_ptr<vx::VoxelRenderer>(new vx::VoxelRenderer(_textureAtlas.get()));
     _chunks = std::shared_ptr<vx::VoxelChunks>(new vx::VoxelChunks(generator));

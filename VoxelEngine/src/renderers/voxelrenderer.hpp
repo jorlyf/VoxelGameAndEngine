@@ -18,7 +18,13 @@ namespace vx
         );
 
     private:
-        std::shared_ptr<float[]> _buffer = nullptr;
+        struct VoxelBuffer
+        {
+            glm::vec3 vertex;
+            glm::vec2 uv;
+        };
+
+        std::shared_ptr<VoxelBuffer[]> _buffer = nullptr;
         uint32_t _vertexCount = 0;
 
         TextureAtlas* _textureAtlas = nullptr;

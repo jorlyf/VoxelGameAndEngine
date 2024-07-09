@@ -5,12 +5,11 @@ vx::VoxelRenderer::VoxelRenderer(TextureAtlas* textureAtlas)
     _textureAtlas = textureAtlas;
 
     const uint32_t VERTEX_PER_VOXEL = 6 * 6;
-    const uint32_t VERTEX_SIZE = 5;
     const uint32_t MAX_VOXEL_COUNT_PER_CHUNK = VoxelChunk::getVolume();
 
     _vertexCount = VERTEX_PER_VOXEL * MAX_VOXEL_COUNT_PER_CHUNK;
-    const uint32_t VERTEX_ARRAY_LENGTH = _vertexCount * VERTEX_SIZE;
-    _buffer = std::shared_ptr<float[]>(new float[VERTEX_ARRAY_LENGTH]);
+    const uint32_t VERTEX_ARRAY_LENGTH = _vertexCount;
+    _buffer = std::shared_ptr<VoxelBuffer[]>(new VoxelBuffer[VERTEX_ARRAY_LENGTH]);
 }
 
 vx::Mesh* vx::VoxelRenderer::renderChunk(
@@ -74,7 +73,7 @@ vx::Mesh* vx::VoxelRenderer::renderChunk(
 
     _vertexCount = triangleIndex * 3;
     const int32_t attributes[] = { 3, 2, 0 };
-    Mesh* mesh = new Mesh(_buffer.get(), _vertexCount, attributes);
+    Mesh* mesh = new Mesh(reinterpret_cast<float*>(_buffer.get()), _vertexCount, attributes);
     return mesh;
 }
 
@@ -85,44 +84,48 @@ void vx::VoxelRenderer::renderTopFace(
     const TextureAtlas::TextureUV uv
 )
 {
-    const uint32_t VERTEX_SIZE = 5;
-    uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
+    uint32_t i = 3 * triangleIndex;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderBottomFace(
@@ -132,44 +135,48 @@ void vx::VoxelRenderer::renderBottomFace(
     const TextureAtlas::TextureUV uv
 )
 {
-    const uint32_t VERTEX_SIZE = 5;
-    uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
+    uint32_t i = 3 * triangleIndex;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
 }
 
 void vx::VoxelRenderer::renderNorthFace(
@@ -179,44 +186,48 @@ void vx::VoxelRenderer::renderNorthFace(
     const TextureAtlas::TextureUV uv
 )
 {
-    const uint32_t VERTEX_SIZE = 5;
-    uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
+    uint32_t i = 3 * triangleIndex;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderSouthFace(
@@ -226,44 +237,48 @@ void vx::VoxelRenderer::renderSouthFace(
     const TextureAtlas::TextureUV uv
 )
 {
-    const uint32_t VERTEX_SIZE = 5;
-    uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
+    uint32_t i = 3 * triangleIndex;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderWestFace(
@@ -273,44 +288,48 @@ void vx::VoxelRenderer::renderWestFace(
     const TextureAtlas::TextureUV uv
 )
 {
-    const uint32_t VERTEX_SIZE = 5;
-    uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
+    uint32_t i = 3 * triangleIndex;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z - 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z - 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
 }
 
 void vx::VoxelRenderer::renderEastFace(
@@ -320,42 +339,46 @@ void vx::VoxelRenderer::renderEastFace(
     const TextureAtlas::TextureUV uv
 )
 {
-    const uint32_t VERTEX_SIZE = 5;
-    uint32_t i = 3 * triangleIndex * VERTEX_SIZE;
+    uint32_t i = 3 * triangleIndex;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y - 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y - 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y;
+    i++;
 
-    _buffer[i++] = position.x + 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x + uv.size.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x + 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x + uv.size.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    i++;
 
-    _buffer[i++] = position.x - 0.5f;
-    _buffer[i++] = position.y + 0.5f;
-    _buffer[i++] = position.z + 0.5f;
-    _buffer[i++] = uv.position.x;
-    _buffer[i++] = uv.position.y + uv.size.y;
+    _buffer[i].vertex.x = position.x - 0.5f;
+    _buffer[i].vertex.y = position.y + 0.5f;
+    _buffer[i].vertex.z = position.z + 0.5f;
+    _buffer[i].uv.x = uv.position.x;
+    _buffer[i].uv.y = uv.position.y + uv.size.y;
 }
