@@ -37,6 +37,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/chunk-generators/ellipse/chunkgeneratorellipse.cpp
     src/chunk-generators/flat/chunkgeneratorflat.cpp
+    src/chunk-generators/standard/chunkgeneratorstandard.cpp
     src/engine/gameengine.cpp
 )
 
@@ -53,5 +54,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     src
     src/chunk-generators/ellipse
     src/chunk-generators/flat
+    src/chunk-generators/standard
     src/engine
 )

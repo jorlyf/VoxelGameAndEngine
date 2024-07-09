@@ -8,6 +8,7 @@
 #include "pathmanager.hpp"
 #include "chunkgeneratorellipse.hpp"
 #include "chunkgeneratorflat.hpp"
+#include "chunkgeneratorstandard.hpp"
 
 vxg::GameEngine::GameEngine(
     const std::string& windowTitle
@@ -47,10 +48,12 @@ void vxg::GameEngine::onStart()
         resourcesPath + "/atlas.png"
     ));
 
-    vx::IVoxelChunkGenerator* generator = new ChunkGeneratorFlat();
+    vx::IVoxelChunkGenerator* generator = new ChunkGeneratorStandard();
 
     _voxelRenderer = std::shared_ptr<vx::VoxelRenderer>(new vx::VoxelRenderer(_textureAtlas.get()));
     _chunks = std::shared_ptr<vx::VoxelChunks>(new vx::VoxelChunks(generator));
+    _chunks->setGenerationRadius(8);
+
     generateVoxelChunks();
     renderVoxelChunks();
 
