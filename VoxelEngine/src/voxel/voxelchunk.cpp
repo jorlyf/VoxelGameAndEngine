@@ -2,9 +2,9 @@
 #include <glm/gtc/noise.hpp>
 #include "voxelchunk.hpp"
 
-uint32_t vx::VoxelChunk::SIZE = 16;
+uint32_t vx::VoxelChunk::SIZE = 8;
 uint32_t vx::VoxelChunk::HEIGHT = 256;
-float vx::VoxelChunk::VOXEL_SIZE = 0.5f;
+float vx::VoxelChunk::VOXEL_SIZE = 1.0f;
 
 vx::VoxelChunk::VoxelChunk(const glm::ivec2& position)
 {
@@ -17,6 +17,11 @@ vx::VoxelChunk::VoxelChunk(const glm::ivec2& position)
 
 vx::VoxelChunk::~VoxelChunk()
 {
+}
+
+void vx::VoxelChunk::update()
+{
+    _isModified = false;
 }
 
 glm::ivec2 vx::VoxelChunk::getPosition() const
@@ -37,6 +42,11 @@ glm::ivec3 vx::VoxelChunk::getVoxelWorldPosition(const glm::ivec3& position)
         position.y,
         position.z + _position.y * SIZE
     );
+}
+
+bool vx::VoxelChunk::isModified() const
+{
+    return _isModified;
 }
 
 uint32_t vx::VoxelChunk::getVolume()

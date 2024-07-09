@@ -7,6 +7,7 @@
 #include "deltatime.hpp"
 #include "pathmanager.hpp"
 #include "chunkgeneratorellipse.hpp"
+#include "chunkgeneratorflat.hpp"
 
 vxg::GameEngine::GameEngine(
     const std::string& windowTitle
@@ -46,15 +47,12 @@ void vxg::GameEngine::onStart()
         resourcesPath + "/atlas.png"
     ));
 
+    vx::IVoxelChunkGenerator* generator = new ChunkGeneratorFlat();
+
     _voxelRenderer = std::shared_ptr<vx::VoxelRenderer>(new vx::VoxelRenderer(_textureAtlas.get()));
-    _chunks = std::shared_ptr<vx::VoxelChunks>(new vx::VoxelChunks());
+    _chunks = std::shared_ptr<vx::VoxelChunks>(new vx::VoxelChunks(generator));
     generateVoxelChunks();
     renderVoxelChunks();
-
-    vx::LineRenderer::addLine(
-        glm::vec3(-0.5f, 0.5f, -0.5f),
-        glm::vec3(-0.5f, 5.f, -0.5f)
-    );
 
     // X
     vx::LineRenderer::addLine(
@@ -68,6 +66,13 @@ void vxg::GameEngine::onStart()
         glm::vec3(0.f, 0.f, -1000.f),
         glm::vec3(0.f, 0.f, 1000.f),
         glm::vec4(0, 0, 1, 1)
+    );
+
+    // 0.5f
+    vx::LineRenderer::addLine(
+        glm::vec3(0.f, -1000.0f, 0.5f),
+        glm::vec3(0.f, 1000.0f, 0.5f),
+        glm::vec4(0, 1, 1, 1)
     );
 
     glClearColor(0.6f, 0.62f, 0.65f, 1);
@@ -87,6 +92,8 @@ void vxg::GameEngine::onUpdate()
         const std::string fpsTitle = std::to_string(fps);
         _window->setTitle(fpsTitle);
     }
+
+    generateVoxelChunks();
 
     const float cameraMoveSpeed = 25.0f * vx::DeltaTime::getDt();
     if (vx::WindowEvents::getKeyboardKeyState(GLFW_KEY_W).isHolding)
@@ -116,6 +123,9 @@ void vxg::GameEngine::onUpdate()
 
 void vxg::GameEngine::onRender()
 {
+    removeVoxelChunks();
+    renderVoxelChunks();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     _shader->use();
@@ -124,9 +134,8 @@ void vxg::GameEngine::onRender()
     _textureAtlas->bind();
     for (auto& chunkMesh : _chunkMeshes)
     {
-        const vx::VoxelChunk* chunk = chunkMesh.first;
+        const glm::ivec2 chunkPosition = chunkMesh.first;
         const vx::Mesh* mesh = chunkMesh.second.get();
-        const glm::ivec2 chunkPosition = chunk->getPosition();
         const glm::mat4 translateMatrix = glm::translate(
             glm::mat4(1.0f),
             glm::vec3(
@@ -143,7 +152,7 @@ void vxg::GameEngine::onRender()
                 vx::VoxelChunk::VOXEL_SIZE
             )
         );
-        const glm::mat4 modelMatrix = translateMatrix;
+        const glm::mat4 modelMatrix = scaleMatrix * translateMatrix;
         _shader->setUniformMatrix("model", modelMatrix);
         mesh->draw();
     }
@@ -155,42 +164,32 @@ void vxg::GameEngine::onRender()
 
 void vxg::GameEngine::generateVoxelChunks()
 {
-    const glm::vec3& cameraPosition = _camera->getPosition();
-    const glm::ivec2 cameraChunkPosition(
-        cameraPosition.x / vx::VoxelChunk::VOXEL_SIZE,
-        cameraPosition.z / vx::VoxelChunk::VOXEL_SIZE
-    );
+    const glm::vec3 cameraPosition = _camera->getPosition();
+    _chunks->update(cameraPosition);
+}
 
-    ChunkGeneratorEllipse generator(
-        2,
-        glm::ivec3(16, 8, 24),
-        glm::ivec3(0, 16, 0)
-    );
-
-    const int32_t generateChunkRadius = 5;
-    for (int32_t x = cameraChunkPosition.x - generateChunkRadius; x < cameraChunkPosition.x + generateChunkRadius; x++)
+void vxg::GameEngine::removeVoxelChunks()
+{
+    const std::vector<glm::ivec2> chunkPositionsToRemove = _chunks->getChunkPositionsToRemove();
+    for (auto& chunkPositionToRemove : chunkPositionsToRemove)
     {
-        for (int32_t z = cameraChunkPosition.y - generateChunkRadius; z < cameraChunkPosition.y + generateChunkRadius; z++)
-        {
-            const glm::ivec2 chunkPosition(x, z);
-            vx::VoxelChunk* chunk = generator.generate(chunkPosition);
-            _chunks->addChunk(chunkPosition, chunk);
-        }
+        _chunkMeshes.erase(chunkPositionToRemove);
     }
 }
 
 void vxg::GameEngine::renderVoxelChunks()
 {
-    const std::unordered_map<glm::ivec2, std::shared_ptr<vx::VoxelChunk>> chunks = _chunks->getChunks();
-    _chunkMeshes.resize(chunks.size());
-    size_t chunkIndex = 0;
-    for (auto& entrie : chunks)
+    const std::vector<glm::ivec2> chunkPositionsToRender = _chunks->getChunkPositionsToRender();
+    for (auto& chunkPositionToRender : chunkPositionsToRender)
     {
-        const glm::ivec2& position = entrie.first;
-        vx::VoxelChunk* chunk = entrie.second.get();
-        const std::shared_ptr<vx::Mesh> mesh = _voxelRenderer->renderChunk(*chunk, *_chunks);
-        _chunkMeshes[chunkIndex].first = chunk;
-        _chunkMeshes[chunkIndex].second = mesh;
-        chunkIndex++;
+        const vx::VoxelChunk* chunkToRender = _chunks->getChunkAt(chunkPositionToRender);
+        renderVoxelChunk(chunkToRender);
     }
+}
+
+void vxg::GameEngine::renderVoxelChunk(const vx::VoxelChunk* chunk)
+{
+    const glm::ivec2 chunkPosition = chunk->getPosition();
+    const std::shared_ptr<vx::Mesh> mesh(_voxelRenderer->renderChunk(*chunk, *_chunks));
+    _chunkMeshes[chunkPosition] = mesh;
 }

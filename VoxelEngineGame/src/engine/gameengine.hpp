@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <unordered_map>
 #include <utility>
 #include "camera.hpp"
 #include "engine.hpp"
@@ -31,7 +32,7 @@ namespace vxg
         std::shared_ptr<vx::TextureAtlas> _textureAtlas = nullptr;
 
         std::shared_ptr<vx::VoxelChunks> _chunks = nullptr;
-        std::vector<std::pair<vx::VoxelChunk*, std::shared_ptr<vx::Mesh>>> _chunkMeshes;
+        std::unordered_map<glm::ivec2, std::shared_ptr<vx::Mesh>> _chunkMeshes;
 
         std::shared_ptr<vx::Shader> _lineShader = nullptr;
 
@@ -40,6 +41,8 @@ namespace vxg
         std::shared_ptr<vx::VoxelRenderer> _voxelRenderer = nullptr;
 
         void generateVoxelChunks();
+        void removeVoxelChunks();
         void renderVoxelChunks();
+        void renderVoxelChunk(const vx::VoxelChunk* chunk);
     };
 }

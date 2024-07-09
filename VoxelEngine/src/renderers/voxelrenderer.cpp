@@ -13,7 +13,7 @@ vx::VoxelRenderer::VoxelRenderer(TextureAtlas* textureAtlas)
     _buffer = std::shared_ptr<float[]>(new float[VERTEX_ARRAY_LENGTH]);
 }
 
-std::shared_ptr<vx::Mesh> vx::VoxelRenderer::renderChunk(
+vx::Mesh* vx::VoxelRenderer::renderChunk(
     const VoxelChunk& voxelChunk,
     const VoxelChunks& voxelChunks
 )
@@ -75,7 +75,7 @@ std::shared_ptr<vx::Mesh> vx::VoxelRenderer::renderChunk(
     _vertexCount = triangleIndex * 3;
     const int32_t attributes[] = { 3, 2, 0 };
     Mesh* mesh = new Mesh(_buffer.get(), _vertexCount, attributes);
-    return std::shared_ptr<Mesh>(mesh);
+    return mesh;
 }
 
 void vx::VoxelRenderer::renderTopFace(

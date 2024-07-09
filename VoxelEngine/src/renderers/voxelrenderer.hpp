@@ -12,7 +12,7 @@ namespace vx
     public:
         VoxelRenderer(TextureAtlas* textureAtlas);
 
-        std::shared_ptr<Mesh> renderChunk(
+        Mesh* renderChunk(
             const VoxelChunk& voxelChunk,
             const VoxelChunks& voxelChunks
         );
