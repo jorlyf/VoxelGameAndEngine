@@ -33,7 +33,6 @@ void vx::Engine::update()
 
 void vx::Engine::render()
 {
-
     onRender();
     _window->swapBuffers();
 }

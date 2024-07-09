@@ -32,6 +32,8 @@ void vx::Window::init(const uint32_t width, const uint32_t height, const std::st
     //     throw std::runtime_error("Failed to init glew");
     // }
 
+    glfwSwapInterval(1);
+
     onResize(_width, _height);
 
     initEvents();
