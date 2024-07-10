@@ -26,7 +26,7 @@ find_library(
 )
 
 add_library(${PROJECT_NAME} STATIC
-    PathManager/pathmanager.cpp
+    pathManager/pathmanager.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
@@ -37,5 +37,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}
-    PathManager
+    pathManager
 )

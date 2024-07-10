@@ -12,7 +12,7 @@ vx::Mesh::Mesh(
     _primitiveType = primitiveType;
 
     _vertexSize = 0;
-    for (int i = 0; attributes[i]; i++)
+    for (int32_t i = 0; attributes[i]; i++)
     {
         _vertexSize += attributes[i];
     }
@@ -25,7 +25,7 @@ vx::Mesh::Mesh(
     glBufferData(GL_ARRAY_BUFFER, _vertexCount * sizeof(float) * _vertexSize, vertexBuffer, GL_STATIC_DRAW);
 
     int32_t offset = 0;
-    for (uint32_t i = 0; attributes[i]; i++)
+    for (int32_t i = 0; attributes[i]; i++)
     {
         const int32_t size = attributes[i];
         glVertexAttribPointer(i, size, GL_FLOAT, GL_FALSE, _vertexSize * sizeof(float), (GLvoid*)(offset * sizeof(float)));

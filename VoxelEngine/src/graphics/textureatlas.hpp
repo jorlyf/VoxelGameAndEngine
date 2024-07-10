@@ -29,8 +29,6 @@ namespace vx
 
         /// @brief 
         /// @param textures where key = alias, value = index of texture
-        /// @param textureSize 
-        /// @param filePath 
         static TextureAtlas* loadFromFile(
             const std::map<std::string, uint16_t>& textures,
             const glm::ivec2& textureSize,
