@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(voxel-engine-voxel)
+project(voxel-engine-statistic)
 
 include_directories(../../deps/include)
 
@@ -25,17 +25,21 @@ find_library(
     REQUIRED
 )
 
+find_library(
+    GLM_LIB
+    glm
+    REQUIRED
+)
+
 add_library(${PROJECT_NAME} STATIC
-    voxel.cpp
-    voxelchunk.cpp
-    voxelchunks.cpp
+    enginestatistic.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     ${GL_LIB}
     ${GLFW_LIB}
     ${GLEW_LIB}
-    voxel-engine-statistic
+    ${GLM_LIB}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

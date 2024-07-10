@@ -1,4 +1,6 @@
+#include <GLFW/glfw3.h>
 #include "voxelchunks.hpp"
+#include "enginestatistic.hpp"
 
 vx::VoxelChunks::VoxelChunks(vx::IVoxelChunkGenerator* generator)
 {
@@ -80,6 +82,7 @@ void vx::VoxelChunks::setGenerationRadius(const int32_t radius)
 
 void vx::VoxelChunks::generateChunks()
 {
+    const double start = glfwGetTime();
     _chunkPositionsToRender.clear();
 
     for (int32_t x = _centerChunkPosition.x - _generationRadius; x < _centerChunkPosition.x + _generationRadius; x++)
@@ -93,6 +96,13 @@ void vx::VoxelChunks::generateChunks()
             addChunk(chunkPosition, chunk);
             _chunkPositionsToRender.push_back(chunkPosition);
         }
+    }
+
+    const double end = glfwGetTime();
+
+    if (!_chunkPositionsToRender.empty())
+    {
+        EngineStatistic::updateChunksGenerationTime(end - start);
     }
 }
 

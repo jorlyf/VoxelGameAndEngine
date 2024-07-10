@@ -48,11 +48,11 @@ void vxg::GameEngine::onStart()
         resourcesPath + "/atlas.png"
     ));
 
-    vx::IVoxelChunkGenerator* generator = new ChunkGeneratorFlat();
+    vx::IVoxelChunkGenerator* generator = new ChunkGeneratorStandard();
 
     _voxelRenderer = std::shared_ptr<vx::VoxelRenderer>(new vx::VoxelRenderer(_textureAtlas.get()));
     _chunks = std::shared_ptr<vx::VoxelChunks>(new vx::VoxelChunks(generator));
-    _chunks->setGenerationRadius(8);
+    _chunks->setGenerationRadius(2);
 
     generateVoxelChunks();
     renderVoxelChunks();
@@ -69,13 +69,6 @@ void vxg::GameEngine::onStart()
         glm::vec3(0.f, 0.f, -1000.f),
         glm::vec3(0.f, 0.f, 1000.f),
         glm::vec4(0, 0, 1, 1)
-    );
-
-    // 0.5f
-    vx::LineRenderer::addLine(
-        glm::vec3(0.f, -1000.0f, 0.5f),
-        glm::vec3(0.f, 1000.0f, 0.5f),
-        glm::vec4(0, 1, 1, 1)
     );
 
     glClearColor(0.6f, 0.62f, 0.65f, 1);

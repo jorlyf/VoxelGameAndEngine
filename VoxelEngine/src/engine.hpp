@@ -19,5 +19,8 @@ namespace vx
 
     protected:
         Window* _window = nullptr;
+
+    private:
+        void renderStatistics();
     };
 }

@@ -11,6 +11,7 @@ add_subdirectory(src/dt)
 add_subdirectory(src/graphics)
 add_subdirectory(src/loaders)
 add_subdirectory(src/renderers)
+add_subdirectory(src/statistic)
 add_subdirectory(src/utils)
 add_subdirectory(src/voxel)
 add_subdirectory(src/window)
@@ -25,6 +26,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     voxel-engine-graphics
     voxel-engine-loaders
     voxel-engine-renderers
+    voxel-engine-statistic
     voxel-engine-utils
     voxel-engine-voxel
     voxel-engine-window
