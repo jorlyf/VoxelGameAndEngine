@@ -18,13 +18,13 @@ namespace vx
         );
 
     private:
-        struct VoxelBuffer
+        struct VoxelVertex
         {
             glm::vec3 vertex;
             glm::vec2 uv;
         };
 
-        std::shared_ptr<VoxelBuffer[]> _buffer = nullptr;
+        std::shared_ptr<VoxelVertex[]> _vertices = nullptr;
         uint32_t _vertexCount = 0;
 
         TextureAtlas* _textureAtlas = nullptr;

@@ -19,8 +19,15 @@ namespace vx
         static void draw();
 
     private:
-        static std::shared_ptr<float[]> _buffer;
+        struct LineVertex
+        {
+            glm::vec3 position;
+            glm::vec4 color;
+        };
+
+        static std::shared_ptr<LineVertex[]> _vertices;
         static uint32_t _vertexCount;
+
         static std::shared_ptr<Mesh> _mesh;
     };
 }

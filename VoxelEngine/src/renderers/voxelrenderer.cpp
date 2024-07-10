@@ -9,7 +9,7 @@ vx::VoxelRenderer::VoxelRenderer(TextureAtlas* textureAtlas)
 
     _vertexCount = VERTEX_PER_VOXEL * MAX_VOXEL_COUNT_PER_CHUNK;
     const uint32_t VERTEX_ARRAY_LENGTH = _vertexCount;
-    _buffer = std::shared_ptr<VoxelBuffer[]>(new VoxelBuffer[VERTEX_ARRAY_LENGTH]);
+    _vertices = std::shared_ptr<VoxelVertex[]>(new VoxelVertex[VERTEX_ARRAY_LENGTH]);
 }
 
 vx::Mesh* vx::VoxelRenderer::renderChunk(
@@ -73,7 +73,7 @@ vx::Mesh* vx::VoxelRenderer::renderChunk(
 
     _vertexCount = triangleIndex * 3;
     const int32_t attributes[] = { 3, 2, 0 };
-    Mesh* mesh = new Mesh(reinterpret_cast<float*>(_buffer.get()), _vertexCount, attributes);
+    Mesh* mesh = new Mesh(reinterpret_cast<float*>(_vertices.get()), _vertexCount, attributes);
     return mesh;
 }
 
@@ -86,46 +86,46 @@ void vx::VoxelRenderer::renderTopFace(
 {
     uint32_t i = 3 * triangleIndex;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderBottomFace(
@@ -137,46 +137,46 @@ void vx::VoxelRenderer::renderBottomFace(
 {
     uint32_t i = 3 * triangleIndex;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
 }
 
 void vx::VoxelRenderer::renderNorthFace(
@@ -188,46 +188,46 @@ void vx::VoxelRenderer::renderNorthFace(
 {
     uint32_t i = 3 * triangleIndex;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderSouthFace(
@@ -239,46 +239,46 @@ void vx::VoxelRenderer::renderSouthFace(
 {
     uint32_t i = 3 * triangleIndex;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
 }
 
 void vx::VoxelRenderer::renderWestFace(
@@ -290,46 +290,46 @@ void vx::VoxelRenderer::renderWestFace(
 {
     uint32_t i = 3 * triangleIndex;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z - 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z - 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
 }
 
 void vx::VoxelRenderer::renderEastFace(
@@ -341,44 +341,44 @@ void vx::VoxelRenderer::renderEastFace(
 {
     uint32_t i = 3 * triangleIndex;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y - 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y - 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y;
     i++;
 
-    _buffer[i].vertex.x = position.x + 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x + uv.size.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x + 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x + uv.size.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
     i++;
 
-    _buffer[i].vertex.x = position.x - 0.5f;
-    _buffer[i].vertex.y = position.y + 0.5f;
-    _buffer[i].vertex.z = position.z + 0.5f;
-    _buffer[i].uv.x = uv.position.x;
-    _buffer[i].uv.y = uv.position.y + uv.size.y;
+    _vertices[i].vertex.x = position.x - 0.5f;
+    _vertices[i].vertex.y = position.y + 0.5f;
+    _vertices[i].vertex.z = position.z + 0.5f;
+    _vertices[i].uv.x = uv.position.x;
+    _vertices[i].uv.y = uv.position.y + uv.size.y;
 }
